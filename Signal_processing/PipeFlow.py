@@ -32,7 +32,7 @@ print("For a variability of 5 procent the number of blocks have to be" ,NumberOf
 
 
 
-#Probe cut of frequency - VictorNote: Tror det må være det samme med længde og højde
+#Probe cut of frequency
 
 def ProbeCutOff(Length, Width, Flowspeed):
     U = Flowspeed
