@@ -93,87 +93,54 @@ plt.title('Power spectrum for all blocks')
 S0 = 2*np.mean(u_var_mean)*integrated_autocorr
 
 n_sample = [200, 400, 600, 800, 1000, 1200]
-
-# Create subplots
-fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 8))
-fig.suptitle('Power spectrum for different sample sizes')
-
-for i, e in enumerate(n_sample):
-    row = i // 3
-    col = i % 3
-
-    # Extracting the subplot
-    ax = axes[row, col]
-    f_sample = np.arange(e) / (e * dt)
-    u_sample = u[:e, :]
+plt.figure()
+for ns in n_sample:
+    f_sample = np.arange(ns) / (ns * dt)
+    u_sample = u[:ns, :]
     uft_sample = dt * np.fft.fft(u_sample, axis=0)
-    S_sample = uft_sample * uft_sample.conjugate() / (e * dt)
+    S_sample = uft_sample * uft_sample.conjugate() / (ns * dt)
     S_sample_mean = np.mean(S_sample, axis=1)
 
-    # Plotting on the subplot
-    ax.loglog(f_sample[0:e//2], S_sample_mean[0:e//2].real, label=f'Sample size: {e}')
-    ax.set_xlabel('Frequency [Hz]')
-    ax.set_ylabel('Power spectrum [m^2/s]')
-    ax.set_title(f'Sample size: {e}')
-    ax.legend()
+    plt.loglog(f_sample[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Sample size: {ns}')
 
-plt.tight_layout()
-
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Power spectrum [m^2/s]')
+plt.title('Power spectrum for different sample sizes')
+plt.legend()
 
 n_step = [1, 2, 3, 4, 5, 6]
-# Create subplots
-fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 8))
-fig.suptitle('Power spectrum for different step sizes')
-
-for i, e in enumerate(n_step):
-    row = i // 3
-    col = i % 3
-
-    # Extracting the subplot
-    ax = axes[row, col]
-
-    u_sample = u[::e, :]
+plt.figure()
+for step in n_step:
+    u_sample = u[::step, :]
     ns, _ = u_sample.shape
-    f_sample = np.arange(ns) / (ns * dt*e)
-    uft_sample = dt * np.fft.fft(u_sample, axis=0)
-    S_sample = uft_sample * uft_sample.conjugate() / (ns * dt)
+    f_sample = np.arange(ns) / (ns * dt * step)
+    uft_sample = dt * step * np.fft.fft(u_sample, axis=0)
+    S_sample = uft_sample * uft_sample.conjugate() / (ns * dt * step)
     S_sample_mean = np.mean(S_sample, axis=1)
 
-    # Plotting on the subplot
-    ax.loglog(f[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Step size: {e}')
-    ax.set_xlabel('Frequency [Hz]')
-    ax.set_ylabel('Power spectrum [m^2/s]')
-    ax.set_title(f'Step size: {e}')
-    ax.legend()
+    plt.loglog(f_sample[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Step size: {step}')
 
-plt.tight_layout()
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Power spectrum [m^2/s]')
+plt.title('Power spectrum for different step sizes')
+plt.legend()
 
 n_blocks = [100, 200, 400, 600, 800, 1000]
-# Create subplots
-fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(15, 8))
-fig.suptitle('Power spectrum for different step sizes')
-
-for i, e in enumerate(n_blocks):
-    row = i // 3
-    col = i % 3
-
-    # Extracting the subplot
-    ax = axes[row, col]
-
-    u_sample = u[:, :e]
+plt.figure()
+for blocks in n_blocks:
+    u_sample = u[:, :blocks]
     ns, _ = u_sample.shape
-    f_sample = np.arange(ns) / (ns * dt*e)
+    f_sample = np.arange(ns) / (ns * dt)
     uft_sample = dt * np.fft.fft(u_sample, axis=0)
     S_sample = uft_sample * uft_sample.conjugate() / (ns * dt)
     S_sample_mean = np.mean(S_sample, axis=1)
 
-    # Plotting on the subplot
-    ax.loglog(f[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Blocks: {e}')
-    ax.set_xlabel('Frequency [Hz]')
-    ax.set_ylabel('Power spectrum [m^2/s]')
-    ax.set_title(f'BLocks: {e}')
-    ax.legend()
+    plt.loglog(f_sample[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Blocks: {blocks}')
 
-plt.tight_layout()
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Power spectrum [m^2/s]')
+plt.title('Power spectrum for different numbers of blocks')
+plt.legend()
+plt.show()
 
 plt.show()
