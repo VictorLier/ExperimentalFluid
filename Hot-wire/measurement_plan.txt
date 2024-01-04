@@ -1,0 +1,6 @@
+1) First calibration (subgroup 1)
+2) Take a small selection of point measurements to get an idea of the flow (subgroup 2)
+3) Take measurements at valve exit (subgroup 1)
+4) Take measurements at 7D (8/2+3) from exit (subgroup 2)
+5) Introduce object at take measurements behind such object to conduct spectrum analysis. (subgroup 1)
+6) Perform calibration again and confirm conditions has not been altered. (subgroup 2)
