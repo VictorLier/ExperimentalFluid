@@ -101,7 +101,7 @@ for ns in n_sample:
     S_sample = uft_sample * uft_sample.conjugate() / (ns * dt)
     S_sample_mean = np.mean(S_sample, axis=1)
 
-    plt.loglog(f_sample[0:ns//2], S_sample_mean[0:ns//2].real, label=f'Sample size: {ns}')
+    plt.loglog(f_sample[1:ns//2], S_sample_mean[1:ns//2].real, label=f'Sample size: {ns}')
 
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Power spectrum [m^2/s]')
