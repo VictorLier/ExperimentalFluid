@@ -17,7 +17,7 @@ Tu = d_nozzle_exit/U # s
 fs = 1/(2*Tu) # Hz
 
 # Estimate of number of independed samples
-N_indep = np.ceil(1/epsilon)
+N_indep = np.ceil(1/epsilon**2)
 
 # T tot
 T_tot = 2*Tu*N_indep # s
