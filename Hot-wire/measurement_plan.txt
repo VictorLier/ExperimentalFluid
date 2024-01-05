@@ -1,37 +1,25 @@
 1) First calibration (subgroup 1)
-2) Take a small selection of point measurements.
-The nuzzle exit velocity is set at 10 m/s. ---- Bernoulli
-Two at the centerline with distance 0.1D and 7D and one at 7D with a distance of 1D from centerline. (subgroup 2) --- Kan bare smide i shear layer
 
-With a measuremnt frequency of 50 Hz and a total time of 2 sec. (100 independent samples) - 1% accuracy
-1 kHz anti-aliasing filter of 1 kHz ---- anti aliasing skal bare dø
+2) Take a small selection of point measurements.
+The nuzzle exit velocity is set at 10 m/s.
+Two at the centerline with distance 0.1D and 7D and one at 7D with a distance of 3D from centerline. (subgroup 2)
+With a measuremnt frequency of 50 Hz and a total time of 200 sec. (10000 independent samples) - 1% accuracy
 
 3) Take measurements at valve exit (subgroup 1)
 With the same measurement settings subgroup 1 will measure the velocity profile at 0.1 D from the nozzle.
-
-With 7 equally spaced measurements from -0.6D to 0.6D  ----  Flere punkter omkring shearlayer
-
+With 7 measurements at (-0.6D, -0.5D, -0.4D, 0, 0.4D, 0.5D, 0.6D)
 Should be centerline, inside and oustide the shearlayer
 
 4) Take measurements at 7D (8/2+3) from exit (subgroup 2)
-With 9 equally spaced measurements from -1.5D to 1.5D ---- Mere om det kan lade sig gøre at finde kanten. Måske et par stykker omkring centerline.
-
+With 9 equally spaced measurements from -1.5D to 1.5D
 If the velocity at the most extreme is still a realitively high velocity (Higher than 10% of centerline velocity) more measurement points is added.
-
 Should be centerline, inside and oustide the shearlayer
 
 5) Introduce object at take measurements behind such object to conduct spectrum analysis. 
-
-Measurement frequency is 1.5 kHz with Anti-aliasing filter of 3 kHz and a total time of 1002 seconds.
-
+Measurement frequency is 1.5 kHz and a total time of 808 seconds with n_blocks 200 and accuracy of 5%
 The cylindrical rod is introduced at a distance of 0.5D from the nozzle exit.
-
 Subgroup 1 places the hotwire with a distance of 1D from nozzle exit
-
 Subgroup 2 places the hotwire with a distance of 5D from nozzle exit.
-
 Both groupes makes a measurement with and without the cylinder in place.
 
 6) Perform calibration again and confirm conditions has not been altered. (subgroup 2)
-
-git test
