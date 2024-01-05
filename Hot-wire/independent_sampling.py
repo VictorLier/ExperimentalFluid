@@ -19,8 +19,8 @@ fs = 1/(2*Tu) # Hz
 # Estimate of number of independed samples
 N_indep = np.ceil(1/epsilon)
 
-# T block
-T_block = 2*Tu*N_indep # s
+# T tot
+T_tot = 2*Tu*N_indep # s
 
 stop = True
 
