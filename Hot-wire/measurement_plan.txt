@@ -1,22 +1,22 @@
 1) First calibration (subgroup 1)
 2) Take a small selection of point measurements.
-The nuzzle exit velocity is set at 10 m/s.
-Two at the centerline with distance 0.1D and 7D and one at 7D with a distance of 1D from centerline. (subgroup 2)
+The nuzzle exit velocity is set at 10 m/s. ---- Bernoulli
+Two at the centerline with distance 0.1D and 7D and one at 7D with a distance of 1D from centerline. (subgroup 2) --- Kan bare smide i shear layer
 
 With a measuremnt frequency of 50 Hz and a total time of 2 sec. (100 independent samples) - 1% accuracy
-1 kHz anti-aliasing filter of 1 kHz
+1 kHz anti-aliasing filter of 1 kHz ---- anti aliasing skal bare dø
 
 3) Take measurements at valve exit (subgroup 1)
 With the same measurement settings subgroup 1 will measure the velocity profile at 0.1 D from the nozzle.
 
-With 7 equally spaced measurements from -0.6D to 0.6D
+With 7 equally spaced measurements from -0.6D to 0.6D  ----  Flere punkter omkring shearlayer
 
 Should be centerline, inside and oustide the shearlayer
 
 4) Take measurements at 7D (8/2+3) from exit (subgroup 2)
-With 9 equally spaced measurements from -1.5D to 1.5D
+With 9 equally spaced measurements from -1.5D to 1.5D ---- Mere om det kan lade sig gøre at finde kanten. Måske et par stykker omkring centerline.
 
-If the velocity at the most extreme is still a realitively high velocity (Higher than 10% of centerline velocity) more measurement points is added
+If the velocity at the most extreme is still a realitively high velocity (Higher than 10% of centerline velocity) more measurement points is added.
 
 Should be centerline, inside and oustide the shearlayer
 
