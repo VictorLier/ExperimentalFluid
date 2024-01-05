@@ -33,3 +33,5 @@ Subgroup 2 places the hotwire with a distance of 5D from nozzle exit.
 Both groupes makes a measurement with and without the cylinder in place.
 
 6) Perform calibration again and confirm conditions has not been altered. (subgroup 2)
+
+git test
