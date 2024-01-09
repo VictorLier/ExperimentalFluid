@@ -16,9 +16,10 @@ U = 10 # m/s
 
 # Conservative estimate of integral time scale
 Tu = d_nozzle_exit/U # s
+#Tu = 0.0007853
 
 # Samling rate
-fs = min(U/(2*l_wire), U/(2*d_wire)) # Hz
+fs = max(U/(2*l_wire), U/(2*d_wire)) # Hz
 
 # Estimate of number of independed samples
 N_b = np.ceil(1/epsilon**2)

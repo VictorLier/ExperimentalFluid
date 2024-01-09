@@ -11,13 +11,17 @@ epsilon = 0.01 # %
 U = 10 # m/s
 
 # Conservative estimate of integral time scale
-Tu = d_nozzle_exit/U # s
+#Tu = d_nozzle_exit/U # s
+Tu = 0.0007853
 
 # Sampling rate
 fs = 1/(2*Tu) # Hz
 
 # Estimate of number of independed samples
-N_indep = np.ceil(1/epsilon**2)
+mean= 6.1190
+var=4.8025
+N_indep = np.ceil(1/(epsilon**2)*(var/mean**2))
+
 
 # T tot
 T_tot = 2*Tu*N_indep # s
