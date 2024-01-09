@@ -18,6 +18,10 @@ With the same measurement settings subgroup 1 will measure the velocity profile 
 With 7 measurements at (-0.6D, -0.5D, -0.4D, 0, 0.4D, 0.5D, 0.6D)
 Should be centerline, inside and oustide the shearlayer
 
+------ Hvad er der sket -------
+Med måleindstilinger som før blev der målt på tværs af jetten, med en afstand på ca. 0.1D
+
+
 4) Take measurements at 7D (8/2+3) from exit (subgroup 2)
 With 9 equally spaced measurements from -1.5D to 1.5D
 If the velocity at the most extreme is still a realitively high velocity (Higher than 10% of centerline velocity) more measurement points is added.
