@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # Set sample frequency, fs
     fs = 600
     # Set number of samples, nsam
-    nsam = fs*15
+    nsam = fs*2
     
     # Record data as an array of voltages
     data_out = getdata(fs,nsam, channel)
@@ -63,4 +63,4 @@ if __name__ == "__main__":
 
 # Save data
 Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
-np.savetxt('Hot-wire/Measurement/Data/Points/it=Shear1_P=59,30.csv', Data_export, delimiter=',')
+np.savetxt('Hot-wire/Measurement/Data/Profile1/y=40_P=59,30.csv', Data_export, delimiter=',')
