@@ -1,8 +1,8 @@
 import numpy as np
 # Geometries
 d_nozzle_exit = 0.04733 # m
-d_wire = 7*10**(-9) # m
-l_wire = 0.003 # m
+d_wire = 5*10**(-9) # m
+l_wire = 0.00125 # m
 d_pipe = 0.01 # m
 
 #Air properties
