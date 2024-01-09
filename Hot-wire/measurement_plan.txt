@@ -5,6 +5,14 @@ The nuzzle exit velocity is set at 10 m/s.
 Two at the centerline with distance 0.1D and 7D and one at 7D with a distance of 3D from centerline. (subgroup 2)
 With a measuremnt frequency of 50 Hz and a total time of 200 sec. (10000 independent samples) - 1% accuracy
 
+
+--- Hvad der skete ----
+Første punkt måling i centrum af jet exit gav for lille time-integral.
+
+Punktet er flyttet til shear layer omtrenet 1D ude fra exit. Her findes time integral til at være - 0.0007853
+Med denne time integral og flowet i shear layer findes frequency og total time til 600 Hz og 2 sek. med Nindenpentend = 1200
+
+
 3) Take measurements at valve exit (subgroup 1)
 With the same measurement settings subgroup 1 will measure the velocity profile at 0.1 D from the nozzle.
 With 7 measurements at (-0.6D, -0.5D, -0.4D, 0, 0.4D, 0.5D, 0.6D)
