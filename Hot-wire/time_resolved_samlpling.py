@@ -24,7 +24,7 @@ fs = min(U/(2*l_wire), U/(2*d_wire)) # Hz
 N_b = np.ceil(1/epsilon**2)
 
 # T block
-T_block = 100*Tu
+T_block = 200*Tu
 
 # T tot
 T_tot = T_block*N_b + 2*Tu*N_b # s
