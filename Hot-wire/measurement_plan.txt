@@ -19,7 +19,7 @@ With 7 measurements at (-0.6D, -0.5D, -0.4D, 0, 0.4D, 0.5D, 0.6D)
 Should be centerline, inside and oustide the shearlayer
 
 ------ Hvad er der sket -------
-Med måleindstilinger som før blev der målt på tværs af jetten, med en afstand på ca. 0.1D
+Med måleindstilinger som før blev der målt på tværs af jetten, med en afstand på ca. 0.1D. Mange målinger med fokus på shealayer.
 
 
 4) Take measurements at 7D (8/2+3) from exit (subgroup 2)
