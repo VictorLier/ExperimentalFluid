@@ -63,4 +63,4 @@ if __name__ == "__main__":
 
 # Save data
 Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
-np.savetxt('Hot-wire/Measurement/Data/Calibration1/Cal1_P=614,10.csv', Data_export, delimiter=',')
+np.savetxt('Hot-wire/Measurement/Data/Calibration1/Cal1_P=63,40.csv', Data_export, delimiter=',')
