@@ -39,28 +39,30 @@ def getdata(datarate, nsample, channel):
         reader = AnalogSingleChannelReader(task.in_stream)
         reader.read_many_sample(data, nsample, timeout)
     return data
-        
+
 if __name__ == "__main__":
-    
-    # Set measurement channel (use NI MAX program to identify name)
-    # Typically the name is "cDAQ<number>Mod1/ai0" where <number> may change
-    channel = "cDAQ1Mod1/ai0"
 
-    # Set sample frequency, fs
-    fs = 50000
-    # Set number of samples, nsam
-    nsam = fs*2
-    
-    # Record data as an array of voltages
-    data_out = getdata(fs,nsam, channel)
+    for i in range(5):        
+        # Set measurement channel (use NI MAX program to identify name)
+        # Typically the name is "cDAQ<number>Mod1/ai0" where <number> may change
+        channel = "cDAQ1Mod1/ai0"
 
-    # Plot time series
-    time_out = np.linspace(0,nsam-1,nsam)*(1/fs) # Creates time vector
-    plt.plot(time_out,data_out)
-    plt.xlim((time_out[0],time_out[-1]))
-    plt.ylim((0,np.max(data_out)))
-    plt.xlabel("Time [s]")
+        # Set sample frequency, fs
+        fs = 50000
+        # Set number of samples, nsam
+        nsam = fs*1
+        
+        # Record data as an array of voltages
+        data_out = getdata(fs,nsam, channel)
 
-# Save data
-Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
-np.savetxt('Hot-wire/Measurement/Data/Vortex1/y=140_P=60,70.csv', Data_export, delimiter=',')
+        # Plot time series
+        time_out = np.linspace(0,nsam-1,nsam)*(1/fs) # Creates time vector
+        plt.plot(time_out,data_out)
+        plt.xlim((time_out[0],time_out[-1]))
+        plt.ylim((0,np.max(data_out)))
+        plt.xlabel("Time [s]")
+
+
+        # Save data
+        Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
+        np.savetxt(f'Hot-wire/Measurement/Data/Vortex1/{i+1}_P=60,70.csv', Data_export, delimiter=',')
