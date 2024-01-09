@@ -65,4 +65,4 @@ if __name__ == "__main__":
 
         # Save data
         Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
-        np.savetxt(f'Hot-wire/Measurement/Data/Vortex1/{i+1}_P=62,80.csv', Data_export, delimiter=',')
+        np.savetxt(f'Hot-wire/Measurement/Data/VortexUden/{i+1}_P=60,70.csv', Data_export, delimiter=',')
