@@ -47,9 +47,9 @@ if __name__ == "__main__":
     channel = "cDAQ1Mod1/ai0"
 
     # Set sample frequency, fs
-    fs = 200
+    fs = 1000
     # Set number of samples, nsam
-    nsam = fs*4
+    nsam = fs*5
     
     # Record data as an array of voltages
     data_out = getdata(fs,nsam, channel)
