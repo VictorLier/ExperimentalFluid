@@ -47,9 +47,9 @@ if __name__ == "__main__":
     channel = "cDAQ1Mod1/ai0"
 
     # Set sample frequency, fs
-    fs = 50000
+    fs = 200
     # Set number of samples, nsam
-    nsam = fs*30
+    nsam = fs*5
     
     # Record data as an array of voltages
     data_out = getdata(fs,nsam, channel)
@@ -63,4 +63,4 @@ if __name__ == "__main__":
 
 # Save data
 Data_export = np.stack((time_out, data_out), axis=1) #Numpy array with time in first collumn and voltage in second collumn
-np.savetxt('Hot-wire/Measurement/Data/TestData1.txt', Data_export)
+np.savetxt('Hot-wire/Measurement/Data/Calibration1/Cal1_P=0,16.csv', Data_export, delimiter=',')
