@@ -19,13 +19,13 @@ U = 10 # m/s
 Tu = 0.0007853
 
 # Samling rate
-fs = max(U/(2*l_wire), U/(2*d_wire)) # Hz
+fs = min(U/(2*l_wire), U/(2*d_wire)) # Hz
 
 # Estimate of number of independed samples
 N_b = np.ceil(1/epsilon**2)
 
 # T block
-T_block = 200*Tu
+T_block = 1000*Tu
 
 # T tot
 T_tot = T_block*N_b + 2*Tu*N_b # s
