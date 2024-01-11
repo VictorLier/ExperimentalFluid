@@ -15,8 +15,8 @@ epsilon = 0.05 # %
 U = 10 # m/s
 
 # Conservative estimate of integral time scale
-Tu = d_nozzle_exit/U # s
-#Tu = 0.0007853
+#Tu = d_nozzle_exit/U # s
+Tu = 0.0007853
 
 # Samling rate
 fs = max(U/(2*l_wire), U/(2*d_wire)) # Hz
