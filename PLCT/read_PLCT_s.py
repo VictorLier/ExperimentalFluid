@@ -11,8 +11,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # define filename and number of pressure taps
-filename = 'cNACA_Re3M_4.txt'
-nf = 100   # number of pressure taps
+filename = 'PLCT/Data/sNACA_FoilData/sNACA_Re3M_2.txt'
+#filename = 'PLCT/Data/sNACA_FoilData/sNACA_Re5M_2.txt'
+#filename = 'PLCT/Data/sNACA_FoilData/sNACA_Re3M_4.txt'
+#filename = 'PLCT/Data/sNACA_FoilData/sNACA_Re5M_4.txt'
+
+nf = 96   # number of pressure taps
 LE = 46    # number of pressure taps on lower side 
            # (from tailing edge to leading edge)
 
@@ -59,7 +63,7 @@ n+= 128
 wrPTotOriMat = data[n:n+96]    # WakeRake coords [m] (0,x,y,0)
 
 # Plot some of the data
-j = 1  # select case
+j = 2  # select case
 
 n = 1
 plt.figure(n)
@@ -107,7 +111,35 @@ n+=1
 plt.figure(n)
 plt.clf()
 plt.plot(pTotWRMat[:,j], -wrPTotOriMat[:,2], 'bo-', markersize=2)
-plt.axis([0, 1200, -0.4, 0.4])
+#plt.axis([0, 5000, -0.4, 0.4])
 plt.xlabel('Rake pressure [Pa]')
 plt.ylabel('y [m]')
 plt.title('Wake rake pressure')
+
+#plt.show()
+
+# Calculation of the Coeffecients
+# Wall Coefficient of lift - Cl
+Deltax = 0.1
+
+n = 48
+
+Lower = 0
+Upper = 0
+for i in range(n//2):
+    Lower = Lower + Deltax * (pWallPresMat[i+1,j] + pWallPresMat[i,j])
+
+for i in range(n//2, n):
+    Upper = Upper + Deltax * (pWallPresMat[i+1,j] + pWallPresMat[i,j])
+
+L = 1/2 * Lower - 1/2 * Upper
+
+rho = atm[j] / (287.058 * (tempVec[j]+273.15))
+
+Cl = L / (1/2 * rho * u0Vec[j]**2)
+
+print("Wall coeffecient of lift is", Cl)
+
+
+#Foil coeffecient of drag
+
