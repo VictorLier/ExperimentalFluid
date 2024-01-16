@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import scipy
 from scipy.signal import butter, lfilter, hilbert
 from time import time
+import os
 
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
@@ -46,7 +47,7 @@ time1 = time()
 sample_rate = 7.8e6
 optical_shift = 0.2e6
 fdcal = 0.1877e6      #doppler velocity to frequency calibration
-filename = 'data/20231213-100_015_0001_02'
+filename = r'C:\Users\jacob\OneDrive - Danmarks Tekniske Universitet\EksperimentialFluid\LDA_DATA\20240116-0001_test2'
 
 #processing parameters
 gain = 20.0
@@ -60,7 +61,7 @@ burst_schmitt = 0.1
 gaussfit_width = 4
 
 #get signal data from data file
-data1 = scipy.io.loadmat(filename + '.mat')
+data1 = scipy.io.loadmat(os.path.join(filename + '.mat'))
 sig = data1['A'][0,:] 
 np.nan_to_num(sig, copy=False, neginf=-1) # remove -inf in data
 sig = gain * sig
@@ -78,8 +79,9 @@ sig_envelope = np.convolve(sig_hilbert,
 # plot the filteret signal and envelope
 plt.figure(1)
 plt.clf()
-plt.plot(times, sigfilt)
-plt.plot(times, sig_envelope)
+plt.plot(times, sig)
+plt.show()
+#plt.plot(times, sig_envelope)
 
 # apply Schmidt trigger to detect bursts
 istart = []
