@@ -143,3 +143,20 @@ print("Wall coeffecient of lift is", Cl)
 
 #Foil coeffecient of drag
 
+cord = 0.9
+span = 1.999
+
+#Combined normal (To wing) force
+Fn = fgMat[0,j] + fgMat[2,j]
+
+#Combined Tangential (To wing force)
+Ft = fgMat[1,j] + fgMat[3,j]
+
+L = Fn * np.cos(aoAVec[j]*np.pi/180) - Ft * np.sin(aoAVec[j]*np.pi/180)
+
+Cl = L / (1/2 * rho * u0Vec[j]**2 * cord * span)
+
+print("Gauge coeffecient of lift is",Cl)
+
+#Gauge coeffecient of lift
+
