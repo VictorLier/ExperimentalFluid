@@ -47,10 +47,13 @@ time1 = time()
 sample_rate = 7.8e6
 optical_shift = 0.2e6
 fdcal = 0.1877e6      #doppler velocity to frequency calibration
-filename = r'C:\Users\jacob\OneDrive - Danmarks Tekniske Universitet\EksperimentialFluid\LDA_DATA\20240116-0001_test2'
+filename = 'LDA_DATA/20240115-0001_test2_higher level of signal/20240115-0001_test2_higher level of signal_02'
+
+
+
 
 #processing parameters
-gain = 20.0
+gain = 100.0
 filter_center = 1.45e6
 filter_width = 0.5e6
 min_periods = 15
@@ -61,8 +64,11 @@ burst_schmitt = 0.1
 gaussfit_width = 4
 
 #get signal data from data file
-data1 = scipy.io.loadmat(os.path.join(filename + '.mat'))
-sig = data1['A'][0,:] 
+parent_dir = os.path.dirname(os.getcwd())
+filename = os.path.join(parent_dir, filename)
+data1 = scipy.io.loadmat(filename + '.mat')
+sig = data1['A'][0,:]
+sig = sig[len(sig)//10:]
 np.nan_to_num(sig, copy=False, neginf=-1) # remove -inf in data
 sig = gain * sig
 dt = 1 / sample_rate
@@ -79,9 +85,11 @@ sig_envelope = np.convolve(sig_hilbert,
 # plot the filteret signal and envelope
 plt.figure(1)
 plt.clf()
-plt.plot(times, sig)
-plt.show()
+#plt.plot(times, sig)
+plt.plot(times, sigfilt)
 #plt.plot(times, sig_envelope)
+plt.show()
+
 
 # apply Schmidt trigger to detect bursts
 istart = []
@@ -135,7 +143,7 @@ for i, j in zip(istart, iend):
         velocity = (freq - optical_shift) / fdcal
         plt.title("t = %9.7f s, velocity = %6.3f m/s" %
                    (i * dt, velocity))
-
+'''
 # write validated velocities to file
 with open(filename + '.txt', 'w') as f:
     f.write('# arrival time [s]   velocity [m/s]   transit time [s]\n')
@@ -146,5 +154,5 @@ with open(filename + '.txt', 'w') as f:
             velocity = (frequency[i] - optical_shift ) / fdcal
             f.write('{:.9f}  {:.3f}  {:.7f}\n'.format( 
                     arrival_time[i], velocity, transit_time[i]))
-        
+'''     
 print('Time used: %4.2f s' % (time()-time1))        
