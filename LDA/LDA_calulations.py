@@ -30,8 +30,13 @@ class LDA_calcs():
         self._burst_schmitt = 0.1
         self._gaussfit_width = 4
 
+        # Filter meathod
+        #self._filter_method = 'butter'
+        self._filter_method = 'highpass'
+
         # filter signal and find envelope
-        self._band = [self._filter_center - 0.5 * self._filter_width, self._filter_center + 0.5 * self._filter_width]
+        # self._band = [self._filter_center - 0.5 * self._filter_width, self._filter_center + 0.5 * self._filter_width]
+        self._band = [np.inf, 200000]
 
         self._nw = 2048
         self._dt = 1 / self._sample_rate
@@ -53,6 +58,17 @@ class LDA_calcs():
 
     def _butter_bandpass_filter(self, data, lowcut, highcut, fs, order=5):
         b, a = self._butter_bandpass(lowcut, highcut, fs, order=order)
+        y = lfilter(b, a, data)
+        return y
+
+    def _highpass(self, cutoff, fs, order=5):
+        nyq = 0.5 * fs
+        cut = cutoff / nyq
+        b, a = butter(order, cut, btype='hp')
+        return b, a
+
+    def _highpass_filter(self, data, cutoff, fs, order=5):
+        b, a = self._highpass(cutoff, fs, order=order)
         y = lfilter(b, a, data)
         return y
 
@@ -82,8 +98,13 @@ class LDA_calcs():
         self._dt = 1 / self._sample_rate
         times = np.arange(len(sig)) * self._dt
 
-        #sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
-        sigfilt = sig
+        if self._filter_method == 'butter':
+            sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
+        elif self._filter_method == 'highpass':
+            sigfilt = self._highpass_filter(sig, self._band[1], self._sample_rate)
+        else:
+            raise ValueError('Filter method not recognized')
+        
         sig_hilbert = np.abs(hilbert(sigfilt))
         sig_envelope = np.convolve(sig_hilbert, 
                                     np.ones(self._win_width_Hilbert)/self._win_width_Hilbert,
@@ -93,6 +114,13 @@ class LDA_calcs():
             plt.figure()
             plt.title('Raw signal')
             plt.plot(times, sig)
+            plt.xlabel('Time [s]')
+            plt.ylabel('Signal')
+
+            plt.figure()
+            plt.title('Hilbert')
+            plt.plot(times, sigfilt)
+            plt.plot(times, sig_hilbert)
             plt.xlabel('Time [s]')
             plt.ylabel('Signal')
 
@@ -140,7 +168,7 @@ class LDA_calcs():
         f = np.arange(self._nw) / (self._nw * self._dt)
         #ipick = int(np.round(0.386837436/ self._dt)) # select a burst spectrum to plot
         if len(istart) > 0:
-            ipick = istart[1]
+            ipick = istart[30]
         else:
             ipick = None
 
@@ -163,7 +191,7 @@ class LDA_calcs():
             validated.append(self._min_periods <= nfringes and nfringes < self._max_periods)
             
             velocity = (freq - self._optical_shift) / self._fdcal
-            print(j-i, ipeak, velocity, freq)
+            #print(j-i, ipeak, velocity, freq)
             #if plot and i == ipick:
             if plot and i == ipick:
             #if velocity > 2:
@@ -343,23 +371,23 @@ if __name__ == "__main__":
     # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_test2')
     # data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\20240116-0001_7_0cm')
     # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_7_0cm')
-    # data_path = r'LDA'
-    # proc_data_path = r'LDA'
-    data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
-    proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
+    data_path = r'LDA'
+    proc_data_path = r'LDA'
+    # data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
+    # proc_data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
     lda = LDA_calcs(data_path, proc_data_path)
     
-    lda.peak_to_velocity_plot()
+    #lda.peak_to_velocity_plot()
 
-    if False:
+    if True:
         # Eval data
-        # lda.eval_file('20231213-100_015_0001_02', plot=True)
+        lda.eval_file('20231213-100_015_0001_02', plot=True)
         # lda.eval_all_files(plot_index=7)
         # lda.remove_outliers_all_files()
         # lda.get_stats_all_files()
-        lda.full_evaluation()
+        # lda.full_evaluation()
     
-    if False:
+    if True:
         # Visualize data
         lda.plot_all_raw_files(plot_index=0)
     
