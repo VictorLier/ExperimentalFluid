@@ -82,8 +82,7 @@ class LDA_calcs():
         self._dt = 1 / self._sample_rate
         times = np.arange(len(sig)) * self._dt
 
-        #sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
-        sigfilt = sig
+        sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
         sig_hilbert = np.abs(hilbert(sigfilt))
         sig_envelope = np.convolve(sig_hilbert, 
                                     np.ones(self._win_width_Hilbert)/self._win_width_Hilbert,
@@ -163,7 +162,7 @@ class LDA_calcs():
             validated.append(self._min_periods <= nfringes and nfringes < self._max_periods)
             
             velocity = (freq - self._optical_shift) / self._fdcal
-            print(j-i, ipeak, velocity, freq)
+            #print(j-i, ipeak, velocity, freq)
             #if plot and i == ipick:
             if plot and i == ipick:
             #if velocity > 2:
@@ -345,13 +344,13 @@ if __name__ == "__main__":
     # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_7_0cm')
     # data_path = r'LDA'
     # proc_data_path = r'LDA'
-    data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
-    proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
+    data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
+    proc_data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
     lda = LDA_calcs(data_path, proc_data_path)
     
-    lda.peak_to_velocity_plot()
+    #lda.peak_to_velocity_plot()
 
-    if False:
+    if True:
         # Eval data
         # lda.eval_file('20231213-100_015_0001_02', plot=True)
         # lda.eval_all_files(plot_index=7)
@@ -359,7 +358,7 @@ if __name__ == "__main__":
         # lda.get_stats_all_files()
         lda.full_evaluation()
     
-    if False:
+    if True:
         # Visualize data
         lda.plot_all_raw_files(plot_index=0)
     
