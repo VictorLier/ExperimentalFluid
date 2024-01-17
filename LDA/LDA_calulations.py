@@ -33,7 +33,8 @@ class LDA_calcs():
         # filter signal and find envelope
         self._band = [self._filter_center - 0.5 * self._filter_width, self._filter_center + 0.5 * self._filter_width]
 
-        self._nw = 512
+        self._nw = 2048
+        self._dt = 1 / self._sample_rate
 
     def _get_filename_list(self):
         """ Return list of filenames in data_path"""
@@ -75,13 +76,14 @@ class LDA_calcs():
         #get signal data from data file
         data_f = os.path.join(self._data_path, filename)
         data1 = scipy.io.loadmat(data_f + '.mat')
-        sig = data1['A'][0,:] 
-        np.nan_to_num(sig, copy=False, neginf=-1) # remove -inf in data
-        sig = self._gain * sig
-        dt = 1 / self._sample_rate
-        times = np.arange(len(sig)) * dt
+        sig1 = data1['A'][0,:] 
+        sig2 = np.nan_to_num(sig1, copy=False, neginf=0) # remove -inf in data
+        sig = self._gain * sig2
+        self._dt = 1 / self._sample_rate
+        times = np.arange(len(sig)) * self._dt
 
-        sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], 7.8e6)
+        #sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
+        sigfilt = sig
         sig_hilbert = np.abs(hilbert(sigfilt))
         sig_envelope = np.convolve(sig_hilbert, 
                                     np.ones(self._win_width_Hilbert)/self._win_width_Hilbert,
@@ -135,31 +137,33 @@ class LDA_calcs():
         transit_time = []
         validated = []
         
-        f = np.arange(self._nw) / (self._nw * dt)
-        #ipick = int(np.round(0.386837436/ dt)) # select a burst spectrum to plot
+        f = np.arange(self._nw) / (self._nw * self._dt)
+        #ipick = int(np.round(0.386837436/ self._dt)) # select a burst spectrum to plot
         if len(istart) > 0:
             ipick = istart[1]
         else:
             ipick = None
 
         for i, j in zip(istart, iend):
-            if j-i > self._nw: continue  # burst too long to handle
+            if j-i > self._nw:
+                continue  # burst too long to handle
             window = np.zeros(self._nw)
             window[0:j-i] = sigfilt[i:j]
             sigf = np.fft.fft(window)
-            sigspec = np.real(sigf * sigf.conjugate()) / (self._nw*dt)
+            sigspec = np.real(sigf * sigf.conjugate()) / (self._nw*self._dt)
             # ipeak = np.argmax(sigspec) # Old method: Did not work beacause of symmetric spectrum - sometimes the peak was chosen to be the wrong side of the spectrum
             ipeak = np.argmax(sigspec[0:self._nw//2])
             ifrac = self._gauss_interpolate(sigspec[ipeak-1:ipeak+2])
-            freq = (ipeak + ifrac) / (self._nw * dt)
-            transit = (j - i) * dt
+            freq = (ipeak + ifrac) / (self._nw * self._dt)
+            transit = (j - i) * self._dt
             nfringes = freq * transit
             frequency.append(freq)
-            arrival_time.append(i * dt)
+            arrival_time.append(i * self._dt)
             transit_time.append(transit)
             validated.append(self._min_periods <= nfringes and nfringes < self._max_periods)
             
             velocity = (freq - self._optical_shift) / self._fdcal
+            print(j-i, ipeak, velocity, freq)
             #if plot and i == ipick:
             if plot and i == ipick:
             #if velocity > 2:
@@ -171,7 +175,7 @@ class LDA_calcs():
                 plt.plot(f[ipeak], sigspec[ipeak], 'ro')
                 velocity = (freq - self._optical_shift) / self._fdcal
                 plt.title("t = %9.7f s, velocity = %6.3f m/s, nfringes:  %f, freq: %f, transit: %f, ipeak: %i, ifrac: %f" %
-                        (i * dt, velocity, nfringes, freq, transit, ipeak, ifrac))
+                        (i * self._dt, velocity, nfringes, freq, transit, ipeak, ifrac))
 
         # write validated velocities to file
         proc_f = os.path.join(self._proc_data_path, filename)
@@ -312,7 +316,21 @@ class LDA_calcs():
         std_velocity_2 = np.sqrt(np.sum((velocity_total-mean_velocity_2)**2)/(len(velocity_total)-1))
 
         return mean_velocity_2, std_velocity_2
-       
+
+    def peak_to_velocity_plot(self):
+        velocity = []
+        for ipeak in range(self._nw):
+            freq = (ipeak) / (self._nw * self._dt)
+            v = (freq - self._optical_shift) / self._fdcal
+            velocity.append(v)
+        plt.figure()
+        plt.title('Peak to velocity')
+        plt.plot(range(self._nw), velocity)
+        plt.xlabel('Peak')
+        plt.ylabel('Velocity [m/s]')
+        plt.grid()
+        plt.show()
+
     def full_evaluation(self, plot_index: int = None):
         """ Evaluate all files in data_path"""
         self.eval_all_files(plot_index)
@@ -325,23 +343,27 @@ if __name__ == "__main__":
     # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_test2')
     # data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\20240116-0001_7_0cm')
     # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_7_0cm')
-    data_path = r'LDA'
-    proc_data_path = r'LDA'
+    # data_path = r'LDA'
+    # proc_data_path = r'LDA'
+    data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
+    proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\Test_data')
     lda = LDA_calcs(data_path, proc_data_path)
     
-    if True:
+    lda.peak_to_velocity_plot()
+
+    if False:
         # Eval data
-        # lda.eval_file('20240116-0001_test2_01', plot=False)
+        # lda.eval_file('20231213-100_015_0001_02', plot=True)
         # lda.eval_all_files(plot_index=7)
         # lda.remove_outliers_all_files()
         # lda.get_stats_all_files()
         lda.full_evaluation()
     
-    if True:
+    if False:
         # Visualize data
         lda.plot_all_raw_files(plot_index=0)
     
-    if True:
+    if False:
         # Get mean velocity
         lda.get_mean_velocity()
         stop = True
