@@ -167,7 +167,7 @@ for filename in filename_lst:
         F_py = 0
         for i in range(nf-1):
             F_px = F_px + 1/2*(pProfMat[i+1,j] + pProfMat[i,j])*(profOrifMat[i,2]-profOrifMat[i+1,2])
-            F_py = F_py + 1/2*(pProfMat[i+1,j] + pProfMat[i,j])*(profOrifMat[i+1,1]-profOrifMat[i,1])
+            F_py = F_py + 1/2*(pProfMat[i+1,j] + pProfMat[i,j])*(profOrifMat[i,1]-profOrifMat[i+1,1])
         
         L_f = F_py * np.cos(aoAVec[j]*np.pi/180) - F_px*np.sin(aoAVec[j]*np.pi/180)
         Cl_f = L_f / (1/2 * rho * u0Vec[j]**2 * cord )
@@ -212,8 +212,8 @@ T8_1 = pd.DataFrame({'AOA': AOA_lst[:3], 'Cl_w3M': Cl_w_lst[:3], 'Cl_w5M': Cl_w_
 T8_2 = pd.DataFrame({'AOA': AOA_lst[6:9], 'Cl_w3M': Cl_w_lst[6:9], 'Cl_w5M': Cl_w_lst[9:12], 'Cl_f3M': Cl_f_lst[6:9], 'Cl_f5M': Cl_f_lst[9:12], 'Cl_g3M': Cl_g_lst[6:9], 'Cl_g5M': Cl_g_lst[9:12], 'Cd3M': Cd_lst[6:9], 'Cd5M': Cd_lst[9:12]})
 print(T8_1)
 print(T8_2)
-T8_1.to_csv('T8_1.txt', sep='\t', index=False,header=False)
-T8_2.to_csv('T8_2.txt', sep='\t', index=False,header=False)
+T8_1.to_csv('T8_1.m', sep='\t', index=False,header=False)
+T8_2.to_csv('T8_2.m', sep='\t', index=False,header=False)
 
 
 stop = True
