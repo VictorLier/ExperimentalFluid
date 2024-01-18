@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy
 from scipy.signal import butter, lfilter, hilbert
-from time import time
 from numpy import log
 import os
 
@@ -15,14 +14,14 @@ class LDA_calcs():
         self._filename = self._get_filename_list()
 
         # measurement parameters
-        self._sample_rate = 7.8e6
-        self._optical_shift = 0.2e6
+        self._sample_rate = 7.81e6
+        self._optical_shift = 0.2e6 #Obs in experiments in january 0.2e6 is used
         self._fdcal = 0.1877e6      #doppler velocity to frequency calibration
 
         #processing parameters
-        self._gain = 100.0
-        self._filter_center = 1.45e6
-        self._filter_width = 0.5e6
+        self._gain = 16.0*3
+        self._filter_center = 0.6e6
+        self._filter_width = 0.4e6
         self._min_periods = 15
         self._max_periods = 100
         self._win_width_Hilbert = 200
@@ -31,14 +30,18 @@ class LDA_calcs():
         self._gaussfit_width = 4
 
         # Filter meathod
-        #self._filter_method = 'butter'
-        self._filter_method = 'highpass'
+        self._filter_method = 'butter'
+        # self._filter_method = 'highpass'
 
         # filter signal and find envelope
-        # self._band = [self._filter_center - 0.5 * self._filter_width, self._filter_center + 0.5 * self._filter_width]
-        self._band = [np.inf, 200000]
+        if self._filter_method == 'butter':
+            self._band = [self._filter_center - 0.5 * self._filter_width, self._filter_center + 0.5 * self._filter_width] # For butter filter
+        elif self._filter_method == 'highpass':
+            self._band = [700000, np.inf] # For highpass filter
+        else:
+            raise ValueError('Filter method not recognized')
 
-        self._nw = 2048
+        self._nw = 512
         self._dt = 1 / self._sample_rate
 
     def _get_filename_list(self):
@@ -101,7 +104,7 @@ class LDA_calcs():
         if self._filter_method == 'butter':
             sigfilt = self._butter_bandpass_filter(sig, self._band[0], self._band[1], self._sample_rate)
         elif self._filter_method == 'highpass':
-            sigfilt = self._highpass_filter(sig, self._band[1], self._sample_rate)
+            sigfilt = self._highpass_filter(sig, self._band[0], self._sample_rate)
         else:
             raise ValueError('Filter method not recognized')
         
@@ -123,7 +126,6 @@ class LDA_calcs():
             plt.plot(times, sig_hilbert)
             plt.xlabel('Time [s]')
             plt.ylabel('Signal')
-
 
             plt.figure()
             plt.title('Filtered signal and envelope')
@@ -168,7 +170,7 @@ class LDA_calcs():
         f = np.arange(self._nw) / (self._nw * self._dt)
         #ipick = int(np.round(0.386837436/ self._dt)) # select a burst spectrum to plot
         if len(istart) > 0:
-            ipick = istart[30]
+            ipick = istart[0]
         else:
             ipick = None
 
@@ -181,6 +183,16 @@ class LDA_calcs():
             sigspec = np.real(sigf * sigf.conjugate()) / (self._nw*self._dt)
             # ipeak = np.argmax(sigspec) # Old method: Did not work beacause of symmetric spectrum - sometimes the peak was chosen to be the wrong side of the spectrum
             ipeak = np.argmax(sigspec[0:self._nw//2])
+
+            iremove = 1
+            while True:
+                # Incase the peak is located at the edge of the spectrum, find the second higest peak
+                if sigspec[ipeak+1] > sigspec[ipeak] or sigspec[ipeak-1] > sigspec[ipeak]:
+                    ipeak = np.argmax(sigspec[0:self._nw//2][:-1*iremove])
+                    iremove += 1
+                else:
+                    break
+
             ifrac = self._gauss_interpolate(sigspec[ipeak-1:ipeak+2])
             freq = (ipeak + ifrac) / (self._nw * self._dt)
             transit = (j - i) * self._dt
@@ -189,21 +201,18 @@ class LDA_calcs():
             arrival_time.append(i * self._dt)
             transit_time.append(transit)
             validated.append(self._min_periods <= nfringes and nfringes < self._max_periods)
-            
-            velocity = (freq - self._optical_shift) / self._fdcal
-            #print(j-i, ipeak, velocity, freq)
-            #if plot and i == ipick:
+
             if plot and i == ipick:
-            #if velocity > 2:
+                velocity = (freq - self._optical_shift) / self._fdcal
                 print('velocity: {:.3f} m/s, nfringes: {:.3f}, freq: {:.3f} Hz, transit: {:.8f} s, ipeak: {}, ifrac: {}'.format(velocity, nfringes, freq, transit, ipeak, ifrac))
                 plt.figure()
                 plt.plot(f[1:self._nw//2], sigspec[1:self._nw//2], '-o')
-                #plt.plot(f, sigspec, '-o')
+                plt.xlabel('Frequency [Hz]')
+                plt.ylabel('Power')
                 # Indicate the peak
                 plt.plot(f[ipeak], sigspec[ipeak], 'ro')
-                velocity = (freq - self._optical_shift) / self._fdcal
-                plt.title("t = %9.7f s, velocity = %6.3f m/s, nfringes:  %f, freq: %f, transit: %f, ipeak: %i, ifrac: %f" %
-                        (i * self._dt, velocity, nfringes, freq, transit, ipeak, ifrac))
+                # plt.title('Spectrum of burst')
+                plt.title("t = %9.7f s, velocity = %6.3f m/s, nfringes:  %f, freq: %f, transit: %f, ipeak: %i, ifrac: %f" %(i * self._dt, velocity, nfringes, freq, transit, ipeak, ifrac))
 
         # write validated velocities to file
         proc_f = os.path.join(self._proc_data_path, filename)
@@ -228,30 +237,6 @@ class LDA_calcs():
             plot = i == plot_index
             self.eval_file(filename, plot=plot)    
 
-    def plot_all_raw_files(self, plot_index: int = None):
-        # Get all velocity data
-        velocity = []
-        for i, filename in enumerate(self._filename):
-            print('Evaluating file {} of {}'.format(i+1, len(self._filename)))
-            data_f = os.path.join(self._proc_data_path, filename)
-            data1 = np.loadtxt(data_f+'.txt', skiprows=2)
-            velocity.append(list(data1[:,1]))
-        
-        velocity_total = [item for row in velocity for item in row]
-        plt.figure()
-        plt.title('Histogram of all velocities measurements')
-        plt.hist(velocity_total, bins=100)
-        plt.xlabel('Velocity [m/s]')
-        plt.ylabel('Counts')
-        plt.grid()
-
-        if plot_index is not None:
-            plt.figure()
-            plt.title('Histogram of velocity for file {}'.format(self._filename[plot_index]))
-            plt.hist(velocity[plot_index], bins=len(velocity[plot_index])//3)
-            plt.xlabel('Counts')
-            plt.ylabel('Velocity [m/s]')
-            plt.grid()
 
     def remove_outliers(self, filename: str):
         """ Remove outliers from data file"""
@@ -279,18 +264,17 @@ class LDA_calcs():
                     f.write('{:.9f}  {}  {:.7f}\n'.format( 
                             arrival_time[i], velocity[i], transit_time[i]))
 
-        stop = True
 
     def remove_outliers_all_files(self):
         """ Remove outliers from all data files"""
         for i, filename in enumerate(self._filename):
-            print('Evaluating file {} of {}'.format(i+1, len(self._filename)))
             self.remove_outliers(filename)
     
     def get_stats(self, filename: str):
         """ Get mean velocity from data file"""
         data_f = os.path.join(self._proc_data_path, filename)
         data1 = np.loadtxt(data_f+'_valid.txt', skiprows=1)
+
         arrival_time = np.array(data1[:,0])
         velocity = np.array(data1[:,1])
         transit_time = np.array(data1[:,2])
@@ -302,7 +286,7 @@ class LDA_calcs():
         std_velocity = np.sqrt(np.sum((velocity-mean_velocity)**2)/(len(velocity)-1))
 
         return mean_velocity, std_velocity
-    
+        
     def get_stats_all_files(self):
 
         """ Get mean velocity from all data files"""
@@ -335,8 +319,11 @@ class LDA_calcs():
         for i, filename in enumerate(self._filename):
             data_f = os.path.join(self._proc_data_path, filename)
             data1 = np.loadtxt(data_f+'_valid.txt', skiprows=1)
-            velocity.append(list(data1[:,1]))
-            transit_time.append(list(data1[:,2]))
+            try:
+                velocity.append(list(data1[:,1]))
+                transit_time.append(list(data1[:,2]))
+            except:
+                pass
         
         velocity_total = [item for row in velocity for item in row]
         transit_time_total = [item for row in transit_time for item in row]
@@ -344,6 +331,30 @@ class LDA_calcs():
         std_velocity_2 = np.sqrt(np.sum((velocity_total-mean_velocity_2)**2)/(len(velocity_total)-1))
 
         return mean_velocity_2, std_velocity_2
+    
+    def plot_all_velocities(self, plot_index: int = None):
+        # Get all velocity data
+        velocity = []
+        for i, filename in enumerate(self._filename):
+            data_f = os.path.join(self._proc_data_path, filename)
+            data1 = np.loadtxt(data_f+'_valid.txt', skiprows=2)
+            velocity.append(list(data1[:,1]))
+        
+        velocity_total = [item for row in velocity for item in row]
+        plt.figure()
+        plt.title('Histogram of all velocities measurements')
+        plt.hist(velocity_total, bins=50)
+        plt.xlabel('Velocity [m/s]')
+        plt.ylabel('Counts')
+        plt.grid()
+
+        if plot_index is not None:
+            plt.figure()
+            plt.title('Histogram of velocity for file {}'.format(self._filename[plot_index]))
+            plt.hist(velocity[plot_index], bins=len(velocity[plot_index])//3)
+            plt.xlabel('Counts')
+            plt.ylabel('Velocity [m/s]')
+            plt.grid()
 
     def peak_to_velocity_plot(self):
         velocity = []
@@ -367,35 +378,32 @@ class LDA_calcs():
     
 if __name__ == "__main__":
     parent_dir = os.path.dirname(os.getcwd())
-    # data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\20240116-0001_test2')
-    # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_test2')
-    # data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\20240116-0001_7_0cm')
-    # proc_data_path = os.path.join(parent_dir, r'LDA_DATA_OLD\proc_20240116-0001_7_0cm')
-    data_path = r'LDA'
-    proc_data_path = r'LDA'
-    # data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
-    # proc_data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowjet')
+    # data_path = r'LDA'
+    # proc_data_path = r'LDA'
+    data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowJet')
+    proc_data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3_slowJet')
+    # data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3')
+    # proc_data_path = os.path.join(parent_dir, r'LDA_DATA\20240117-0001_test3')
+
     lda = LDA_calcs(data_path, proc_data_path)
     
     #lda.peak_to_velocity_plot()
 
     if True:
         # Eval data
-        lda.eval_file('20231213-100_015_0001_02', plot=True)
+        # lda.eval_file('20240117-0001_test3_03', plot=True)
         # lda.eval_all_files(plot_index=7)
         # lda.remove_outliers_all_files()
         # lda.get_stats_all_files()
-        # lda.full_evaluation()
+        lda.full_evaluation()
     
     if True:
         # Visualize data
-        lda.plot_all_raw_files(plot_index=0)
+        lda.plot_all_velocities(plot_index=None)
     
     if False:
         # Get mean velocity
-        lda.get_mean_velocity()
-        stop = True
-
+        print(lda.get_mean_velocity())
 
     plt.show()
                 
